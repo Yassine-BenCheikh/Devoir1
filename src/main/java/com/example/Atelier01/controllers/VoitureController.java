@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,29 +35,40 @@ public class VoitureController {
 	 SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
 	 Date dateCreation = dateformat.parse(String.valueOf(date));
 	 voiture.setDateCreation(dateCreation);
-
+    
 	 Voiture saveVoiture = voitureService.saveVoiture(voiture);
 	String msg ="voiture enregistré avec Id "+saveVoiture.getIdvoiture();
 	modelMap.addAttribute("msg", msg);
 	return "createVoiture";
 	}
 	@RequestMapping("/ListeVoitures")
-	public String listeVoitures(ModelMap modelMap)
+	public String listeVoitures(ModelMap modelMap,
+			@RequestParam (name="page",defaultValue = "0") int page,
+			@RequestParam (name="size", defaultValue = "2") int size)
 	{
-	List<Voiture> voits = voitureService.getAllVoitures();
-	modelMap.addAttribute("voitures", voits);
-	return "listeVoitures";
+		Page<Voiture> voits = voitureService.getAllVoituresParPage(page, size);
+		modelMap.addAttribute("voitures", voits);
+		 modelMap.addAttribute("pages", new int[voits.getTotalPages()]);
+		modelMap.addAttribute("currentPage", page);
+		return "listeVoitures";
 	}
 	
 	@RequestMapping("/supprimerVoiture")
 	public String supprimerVoiture(@RequestParam("id") Long id,
-	 ModelMap modelMap)
+	ModelMap modelMap,
+	@RequestParam (name="page",defaultValue = "0") int page,
+	@RequestParam (name="size", defaultValue = "2") int size)
 	{
-		voitureService.deleteVoitureById(id);
-	List<Voiture> voits = voitureService.getAllVoitures();
+	voitureService.deleteVoitureById(id);
+	Page<Voiture> voits = voitureService.getAllVoituresParPage(page,
+	size);
 	modelMap.addAttribute("voitures", voits);
+	modelMap.addAttribute("pages", new int[voits.getTotalPages()]);
+	modelMap.addAttribute("currentPage", page);
+	modelMap.addAttribute("size", size);
 	return "listeVoitures";
 	}
+
 
 	
 	@RequestMapping("/modifierVoiture")

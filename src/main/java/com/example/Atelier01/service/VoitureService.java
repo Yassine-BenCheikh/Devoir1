@@ -2,6 +2,8 @@ package com.example.Atelier01.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.example.Atelier01.entities.Voiture;
 
 public interface VoitureService {
@@ -11,5 +13,7 @@ public interface VoitureService {
 	void deleteVoitureById(Long id);
 	Voiture getVoiture(Long id);
 	List<Voiture> getAllVoitures();
+	Page<Voiture> getAllVoituresParPage(int page, int size);
+
 
 }
